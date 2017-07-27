@@ -1,6 +1,6 @@
 <?php
 
-class PostgeSQL extends SQL
+class PostgeSql extends SQL
 {
     public function __construct()
     {
