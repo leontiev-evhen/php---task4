@@ -13,7 +13,7 @@ class Sql
 
     protected $where;
 
-    public function select($table, $fields)
+    protected function select ($table, $fields)
     {
         if ($this->checkArray($fields))
         {
@@ -27,62 +27,59 @@ class Sql
         }
     }
 
-    public function insert($table)
+    protected function insert ($table)
     {
         $this->insert .= 'INSERT INTO '.$table;
         return $this;
     }
 
-    public function update($table)
+    protected function update ($table)
     {
         $this->update = 'UPDATE '.$table;
         return $this;
     }
 
-    public function delete($table)
+    protected function delete ($table)
     {
         $this->delete = 'DELETE FROM '.$table;
         return $this;
     }
 
-    public function where($condition)
+    protected function where ($condition)
     {
-        if ($this->checkArray($condition))
-        {
-            foreach($condition as $k=>$val) {
-
-                $arr[]  = $k.' = '.$val;
-
-            }
-
-            $this->where .= ' WHERE '.$arr[0];
-            return $this;
-        }
+        $this->where = ' WHERE '.key($condition).' = '."'".$condition[key($condition)]."'";
+        return $this;
     }
 
-    public function set ($fields)
+    protected function set ($fields)
     {
         if ($this->checkArray($fields))
         {
-            $this->set = ' SET '.implode(' = ', $fields);
+            foreach($fields as $key=>$val) {
+                $arr[] = $key.' = '."'".$val."'";
+            }
+
+            $this->set = ' SET '.implode(' , ', $arr);
             return $this;
         }
-
     }
 
-    public function values ($set)
+    protected function values ($set)
     {
         if ($this->checkArray($set))
         {
-            $key    = array_keys($set);
-            $values = array_values($set);
-            $this->values = ' ('.implode(',', $key).') VALUES ('.implode(',', $values).')';
+            foreach ($set as $key=>$value) {
+                $aSet[$key] = $this->quoteSimpleColumnName($value);
+            }
+
+            $key    = array_keys($aSet);
+            $values = array_values($aSet);
+            $this->values = ' ('.implode(', ', $key).') VALUES ('.implode(', ', $values).')';
             return $this;
         }
-
     }
 
-    private function checkArray ($array)
+    protected function checkArray ($array)
     {
         if (is_array($array)) {
             return true;
@@ -93,12 +90,15 @@ class Sql
         }
     }
 
+    protected function quoteSimpleColumnName ($name)
+    {
+        return strpos($name, "'") !== false ? $name : "'" . $name . "'";
+    }
 
-    public function execute()
+    protected function execute()
     {
         switch ($this)
         {
-
             case !empty($this->insert):
                 return $this->insert.$this->values;
 
@@ -111,7 +111,6 @@ class Sql
             case !empty($this->delete):
                 return $this->delete.$this->where;
         }
-        //return $this->query;
     }
 
 }

@@ -1,19 +1,89 @@
 <?php
 
-class MySql
+class MySql extends Sql
 {
-    public $connect;
+    private $connect;
     
-    public function connect ()
+   public function __construct ()
     {
-        if ($this->connect = mysql_connect(HOST, USER, PASSWORD_SQL))
+        if ($this->connect = mysqli_connect(HOST, USER, PASSWORD_SQL, DB))
         {
             return $this->connect;
         }
         else
         {
-            throw new Exception('ERROR database');
+            throw new Exception('Could not connect');
         }
     }
+
+    public function select ($table, $fields)
+    {
+        return parent::select($this->quoteSimpleTableName($table), $fields);
+    }
+
+    public function insert ($table)
+    {
+        return parent::insert($this->quoteSimpleTableName($table));
+    }
+
+    public function update ($table)
+    {
+        return parent::update($this->quoteSimpleTableName($table));
+    }
+
+    public function delete ($table)
+    {
+        return parent::delete($this->quoteSimpleTableName($table));
+    }
+
+    public function values ($set)
+    {
+        $aSet = $this->quoteSimpleColumnsName($set);
+        return parent::values($aSet);
+    }
+
+    public function where ($condition)
+    {
+        $aCondition = $this->quoteSimpleColumnsName($condition);
+        return parent::where($aCondition);
+    }
+
+    public function set ($fields)
+    {
+        $aFields = $this->quoteSimpleColumnsName($fields);
+        return parent::set($aFields);
+    }
+
+
+    private function quoteSimpleTableName ($name)
+    {
+        return strpos($name, '`') !== false ? $name : '`' . $name . '`';
+    }
+
+    private function quoteSimpleColumnsName ($fields)
+    {
+        foreach ($fields as $key=>$field)
+        {
+            $key = strpos($key, "`") !== false ? $key : "`" . $key . "`";
+            $aFields[$key] = $field;
+        }
+        return $aFields;
+    }
+
+    public function execute()
+    {
+        $sql = parent::execute();
+        $result = $this->connect->query($sql);
+        if (!$result)
+        {
+            throw new Exception('Mysql query error');
+        }
+        else
+        {
+            return mysqli_fetch_assoc($result);
+        }
+    }
+
+
 }
 ?>

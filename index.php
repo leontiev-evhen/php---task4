@@ -1,35 +1,63 @@
 <?php
+    require_once 'config.php';
     spl_autoload_register(function ($class_name) {
         require_once 'libs/'.$class_name . '.php';
     });
 
     try
     {
-        echo (new Sql())
-            ->insert('MY_TABLE')
-            ->values(['id' => 1, 'name' => 'test'])
-            ->execute().'<br>';
+  /*   (new MySql())
+            ->insert('MY_TEST')
+            ->values(['key' => 'cr7', 'data' => 'test'])
+            ->execute();*/
 
-        echo (new Sql())
-            ->select('MY_TABLE', ['id', 'name'])
-            ->where(['id' => 1])
-            ->execute().'<br>';
-
-        echo (new Sql())
-            ->update('MY_TABLE', ['id', 'name'])
-            ->set(['name', 'test2'])
-            ->where(['id' => 1])
-            ->execute().'<br>';
-
-        echo (new Sql())
-            ->delete('MY_TABLE')
-            ->where(['id' => 1])
+        $mysql = (new MySql())
+            ->select('MY_TEST', ['data'])
+            ->where(['key' => 'user11'])
             ->execute();
+
+ /*
+        echo (new MySql())
+            ->update('MY_TEST')
+            ->set(['key' => 'test11-u', 'data' => 'test'])
+            ->where(['key' => 'user11'])
+            ->execute().'<br>';
+
+        echo (new MySql())
+            ->delete('MY_TEST')
+            ->where(['key' => 1])
+            ->execute();*/
+
+        /*========= Postgresql ===================*/
+        /*
+                $postgresql = (new PostgreSql())
+                        ->select('PG_TEST', ['key', 'data'])
+                        ->where(['key' => 'user11-2'])
+                     ->execute();
+
+
+              /*  echo (new PostgreSql())
+                        ->insert('PG_TEST')
+                        ->values(['key' => 'user11', 'data' => 'test'])
+                        ->execute().'<br>';
+
+                echo (new PostgreSql())
+                        ->update('PG_TEST')
+                        ->set(['key' => 'test11-u', 'data' => 'test'])
+                        ->where(['key' => 'user11'])
+                        ->execute().'<br>';
+
+               (new PostgreSql())
+                    ->delete('PG_TEST')
+                    ->where(['key' => 'user11-2'])
+                    ->execute();*/
 
     }
     catch (Exception $e)
     {
         echo $e->getMessage();
     }
+
+    require_once 'templates/index.php';
 
     ?>
