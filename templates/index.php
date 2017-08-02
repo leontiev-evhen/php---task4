@@ -57,6 +57,7 @@
                     <?php if(isset($postgresql)) {?>
                         <div class="col-md-6">PostgreSql:<br>
                             <?php
+                            
                             if (is_array($postgresql))
                             {
                                 foreach($postgresql as $item)

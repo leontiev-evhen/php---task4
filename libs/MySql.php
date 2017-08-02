@@ -4,11 +4,14 @@ class MySql extends Sql
 {
     private $connect;
     
-   public function __construct ()
+    public function __construct ()
     {
-        if ($this->connect = mysqli_connect(HOST, USER, PASSWORD_SQL, DB))
+        if ($this->connect = mysql_connect(HOST, USER, PASSWORD_SQL, DB))
         {
-            return $this->connect;
+            if (!mysql_select_db(DB, $this->connect))
+            {
+                throw new Exception('DataBase not exist');  
+            }
         }
         else
         {
@@ -73,14 +76,22 @@ class MySql extends Sql
     public function execute()
     {
         $sql = parent::execute();
-        $result = $this->connect->query($sql);
-        if (!$result)
+        $result = mysql_query($sql, $this->connect);
+        
+        if ($result == false)
         {
             throw new Exception('Mysql query error');
         }
         else
         {
-            return mysqli_fetch_assoc($result);
+            if (is_resource($result))
+            {
+                 return mysql_fetch_assoc($result);
+            }
+            else
+            {
+                return SUCCESS_MESSAGE;
+            }
         }
     }
 

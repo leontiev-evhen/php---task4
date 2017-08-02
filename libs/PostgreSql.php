@@ -3,14 +3,11 @@
 class PostgreSql extends Sql
 {
     private $connect;
+    private $pSelect = false;
 
     public function __construct()
     {
-        if ($this->connect = pg_connect("host=".HOST." port=".PORT." dbname=".DB." user=".USER_PG." password=".PASSWORD_PSQL))
-        {
-            return $this->connect;
-        }
-        else
+        if (!$this->connect = pg_connect("host=".HOST." port=".PORT." dbname=".DB." user=".USER_PG." password=".PASSWORD_PSQL))
         {
             throw new Exception('Could not connect');
         }
@@ -19,8 +16,8 @@ class PostgreSql extends Sql
 
     public function select ($table, $fields)
     {
-        return  parent::select($this->quoteSimpleTableName($table), $fields);
-
+         $this->pSelect = true;
+         return  parent::select($this->quoteSimpleTableName($table), $fields);
     }
 
     public function insert ($table)
@@ -42,10 +39,21 @@ class PostgreSql extends Sql
     {
         return parent::where($condition);
     }
+    
+    public function values ($set)
+    {
+        return parent::values($set);
+    }
+   
+   public function set ($fields)
+    {
+        return parent::set($fields);
+    }
 
     private function quoteSimpleTableName ($name)
     {
-        return strpos($name, '"') !== false ? $name : '"' . $name . '"';
+       // return strpos($name, '"') !== false ? $name : '"' . $name . '"';
+       return $name;
     }
 
     public function execute()
@@ -58,7 +66,14 @@ class PostgreSql extends Sql
         }
         else
         {
-            return pg_fetch_row($result);
+            if ($this->pSelect)
+            {
+                 return pg_fetch_row($result);
+            }
+            else
+            {
+                return SUCCESS_MESSAGE;
+            }
         }
     }
     
